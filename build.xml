@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="jar">
+	<property environment="env"/>
+	<property name="project.base.dir" value="."/>
+	<property name="name" value="RayTraceMR"/>
+	<property name="package" value="edu/indiana/cs/p434"/>
+	<property name="src" value="${project.base.dir}/src"/>
+	<property name="classes" value="${project.base.dir}/bin"/>
+	<property name="lib" value="${project.base.dir}/lib"/>
+	<path id="compile.class.path">
+		<pathelement path="${java.class.path}"/>
+		<fileset dir="${lib}">
+			<include name="*.jar"/>
+		</fileset>
+	</path> 
+
+	<target name="init">
+		<mkdir dir="${classes}"/>
+	</target>
+		
+	<target depends="init" name="compile.src">
+		<javac debug="on" memoryMaximumSize="256m" memoryInitialSize="256m" fork="true" destdir="${classes}" srcdir="${src}">
+			<classpath refid="compile.class.path"/>
+		</javac>
+	</target>
+
+	<target depends="compile.src" name="jar">
+		<mkdir dir="${project.base.dir}/temp"/>
+		
+		<!-- <unjar src="${lib}/hadoop-0.20.2-core.jar" dest="${project.base.dir}/temp" overwrite="true"/> -->
+		
+		<unjar src="${lib}/rings.jar" dest="${project.base.dir}/temp" overwrite="true"/>
+		<unjar src="${lib}/Ray-Tracer-API-P434-V1.jar" dest="${project.base.dir}/temp" overwrite="true"/>
+		<jar destfile="${project.base.dir}/${name}.jar">
+			<fileset includes="**/*.class" dir="${classes}"/>
+			<fileset includes="**/*.class" dir="${project.base.dir}/temp"/>
+			<manifest>
+				<attribute name="Main-Class" value="edu.indiana.cs.p434.HadoopRayTracer"/>			
+			</manifest>
+		</jar>
+		<delete dir="${project.base.dir}/temp"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${classes}"/>
+	</target>
+
+</project>
